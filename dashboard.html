@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>KC Traders - Both Strategies</title>
+<style>
+body{background:#0a0e27;color:#e0e0e0;font-family:Segoe UI;margin:0;padding:20px}
+nav{background:#1a1f3a;padding:15px;border-radius:10px;margin-bottom:20px}
+nav a{color:#ffa500;margin-right:20px;text-decoration:none;font-weight:bold}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:#1a1f3a;padding:20px;border-radius:12px;border-left:4px solid #ffa500}
+.sell{border-left-color:#ff4444}.buy{border-left-color:#00ff88}
+.symbol{color:#ffa500;font-size:20px;font-weight:bold}
+.digit{font-size:32px;color:#00ff88;font-weight:bold}
+.counter{font-size:18px;color:#fff;background:#2a3050;padding:10px;border-radius:8px;margin-top:10px}
+.warning{font-size:12px;color:#888;margin-top:40px;border-top:1px solid #333;padding-top:15px}
+@media(max-width:768px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html">Home</a>
+  <a href="dashboard.html">Dashboard</a>
+  <a href="#signals">Live Signals</a>
+  <a href="https://wa.me/254710844216">WhatsApp</a>
+</nav>
+
+<h1>KC Traders - Both Strategies 📊</h1>
+
+<div class="grid">
+  <div class="card sell">
+    <h3>Volatility 100 Index</h3>
+    <p>Strategy: <span class="symbol">DIGIT OVER 7</span></p>
+    <p>Trade: 7, 8, 9</p>
+    <p>Entry Rule: After 2x digits UNDER 4</p>
+    <div class="counter">Last 3 digits: 2, 3, 2 → <b>WAIT</b></div>
+    <p>Stake: $0.35 | Duration: 1 Tick</p>
+    <p>Status: <b>Monitoring...</b></p>
+  </div>
+
+  <div class="card buy">
+    <h3>Volatility 75 Index</h3>
+    <p>Strategy: <span class="symbol">EVEN AFTER 4 ODD</span></p>
+    <p>Entry Rule: 4x ODD digits in a row → Trade EVEN</p>
+    <div class="counter">Current streak: 3 ODD → <b>1 more ODD needed</b></div>
+    <p>Stake: $0.35 | Duration: 5 Ticks</p>
+    <p>Status: <b>Almost ready</b></p>
+  </div>
+</div>
+
+<div class="warning">
+⚠️ Both strategies = high risk. Max stake $0.35. Stop if 3 losses in a row.
+</div>
+</body>
+</html>
