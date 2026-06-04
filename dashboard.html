@@ -1,54 +1,78 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>KC Traders - Both Strategies</title>
-<style>
-body{background:#0a0e27;color:#e0e0e0;font-family:Segoe UI;margin:0;padding:20px}
-nav{background:#1a1f3a;padding:15px;border-radius:10px;margin-bottom:20px}
-nav a{color:#ffa500;margin-right:20px;text-decoration:none;font-weight:bold}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.card{background:#1a1f3a;padding:20px;border-radius:12px;border-left:4px solid #ffa500}
-.sell{border-left-color:#ff4444}.buy{border-left-color:#00ff88}
-.symbol{color:#ffa500;font-size:20px;font-weight:bold}
-.digit{font-size:32px;color:#00ff88;font-weight:bold}
-.counter{font-size:18px;color:#fff;background:#2a3050;padding:10px;border-radius:8px;margin-top:10px}
-.warning{font-size:12px;color:#888;margin-top:40px;border-top:1px solid #333;padding-top:15px}
-@media(max-width:768px){.grid{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-<nav>
-  <a href="index.html">Home</a>
-  <a href="dashboard.html">Dashboard</a>
-  <a href="#signals">Live Signals</a>
-  <a href="https://wa.me/254710844216">WhatsApp</a>
-</nav>
+<script>
+const APP_ID = 1089; // Deriv public app ID
+let ws;
+let v75OddCount = 0;
 
-<h1>KC Traders - Both Strategies 📊</h1>
+function connect() {
+    ws = new WebSocket(`wss://ws.binaryws.com/websockets/v3?app_id=${APP_ID}`);
+    
+    ws.onopen = () => {
+        // Subscribe to live ticks
+        ws.send(JSON.stringify({ticks: '1HZ100V', subscribe: 1}));
+        ws.send(JSON.stringify({ticks: '1HZ75V', subscribe: 1}));
+    };
+    
+    ws.onmessage = (msg) => {
+        const data = JSON.parse(msg.data);
+        if(data.tick) {
+            const symbol = data.tick.symbol;
+            const price = data.tick.quote.toString();
+            const digit = price[price.length - 1];
+            
+            if(symbol === '1HZ100V') updateV100(digit);
+            if(symbol === '1HZ75V') updateV75(digit);
+        }
+    };
+}
 
-<div class="grid">
-  <div class="card sell">
-    <h3>Volatility 100 Index</h3>
-    <p>Strategy: <span class="symbol">DIGIT OVER 7</span></p>
-    <p>Trade: 7, 8, 9</p>
-    <p>Entry Rule: After 2x digits UNDER 4</p>
-    <div class="counter">Last 3 digits: 2, 3, 2 → <b>WAIT</b></div>
-    <p>Stake: $0.35 | Duration: 1 Tick</p>
-    <p>Status: <b>Monitoring...</b></p>
-  </div>
+function updateV100(digit) {
+    document.getElementById('v100-digit').textContent = digit;
+    const status = document.getElementById('v100-status');
+    const btn = document.getElementById('v100-btn');
+    
+    if(parseInt(digit) > 7) {
+        status.className = 'status trade';
+        status.textContent = 'TRADE NOW - DIGIT > 7';
+        btn.style.display = 'block';
+    } else {
+        status.className = 'status wait';
+        status.textContent = 'WAITING for digit > 7';
+        btn.style.display = 'none';
+    }
+}
 
-  <div class="card buy">
-    <h3>Volatility 75 Index</h3>
-    <p>Strategy: <span class="symbol">EVEN AFTER 4 ODD</span></p>
-    <p>Entry Rule: 4x ODD digits in a row → Trade EVEN</p>
-    <div class="counter">Current streak: 3 ODD → <b>1 more ODD needed</b></div>
-    <p>Stake: $0.35 | Duration: 5 Ticks</p>
-    <p>Status: <b>Almost ready</b></p>
-  </div>
-</div>
+function updateV75(digit) {
+    document.getElementById('v75-digit').textContent = digit;
+    const status = document.getElementById('v75-status');
+    const btn = document.getElementById('v75-btn');
+    
+    if(parseInt(digit) % 2 !== 0) v75OddCount++;
+    else v75OddCount = 0;
+    
+    if(v75OddCount >= 4) {
+        status.className = 'status trade';
+        status.textContent = 'TRADE NOW - 4 ODD HIT';
+        btn.style.display = 'block';
+    } else {
+        status.className = 'status wait';
+        status.textContent = `WAITING... ${v75OddCount}/4 ODD`;
+        btn.style.display = 'none';
+    }
+}
 
-<div class="warning">
-⚠️ Both strategies = high risk. Max stake $0.35. Stop if 3 losses in a row.
-</div>
-</body>
-</html>
+// Add BUY buttons to your HTML cards:
+// <button id="v100-btn" onclick="buyTrade('1HZ100V')" style="display:none; width:100%; padding:15px; background:#ff6b00; border:none; border-radius:10px; color:#000; font-weight:bold; font-size:1.2em; margin-top:15px;">BUY NOW $10</button>
+
+function buyTrade(symbol) {
+    alert('Signal detected! Opening Deriv trade...');
+    // Option A: Open Deriv with pre-filled contract
+    window.open(`https://deriv.app/trade?symbol=${symbol}`, '_blank');
+    
+    // Option B: We’ll connect this to Python bot + your API token next
+}
+
+connect();
+setInterval(() => {
+    document.getElementById('update-time').textContent = new Date().toLocaleTimeString();
+}, 1000);
+</script>
